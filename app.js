@@ -10,14 +10,6 @@ app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
 
-app.get('api/v1/books', async (req, res) => {
-    try {
-        const books = await prisma.book.findMany();
-        res.json(books);
-    } catch (error) {
-        res.status(500).json({ error: 'An error occurred while fetching books.' });
-    }
-});
 app.get('api/v1/authors', async (req, res) => {
     try {
         const authors = await prisma.author.findMany();
@@ -26,21 +18,7 @@ app.get('api/v1/authors', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while fetching authors.' });
     }
 });
-app.get('api/v1/books/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const book = await prisma.book.findUnique({
-            where: { id: parseInt(id) },
-        });
-        if (book) {
-            res.json(book);
-        } else {
-            res.status(404).json({ error: 'Book not found.' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'An error occurred while fetching the book.' });
-    }
-});
+
 app.post('api/v1/authors', async (req, res) => {
     const { 
         first_name,
@@ -69,6 +47,29 @@ app.post('api/v1/authors', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating author.' });
+    }
+});
+app.get('api/v1/books', async (req, res) => {
+    try {
+        const books = await prisma.book.findMany();
+        res.json(books);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching books.' });
+    }
+});
+app.get('api/v1/books/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const book = await prisma.book.findUnique({
+            where: { id: parseInt(id) },
+        });
+        if (book) {
+            res.json(book);
+        } else {
+            res.status(404).json({ error: 'Book not found.' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching the book.' });
     }
 });
 app.post('api/v1/books', async (req, res) => {
@@ -101,6 +102,55 @@ app.post('api/v1/books', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error creating book.' });
+    }
+});
+
+app.get('/api/v1/genres', async (req, res) => {
+    try {
+        const genres = await prisma.genre.findMany();
+        res.json(genres);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching genres.' });
+    }
+});
+app.post('/api/v1/genres', async (req, res) => {
+    const { name } = req.body;
+
+    try {
+        const newGenre = await prisma.genre.create({
+            data: { name},
+        });
+        res.status(201).json(newGenre);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating genre.' });
+    }
+});
+app.delete('/api/v1/genres/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deletedGenre = await prisma.genre.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json(deletedGenre);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error deleting genre.' });
+    }
+});
+app.put('/api/v1/genres/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    try {
+        const updatedGenre = await prisma.genre.update({
+            where: { id: parseInt(id) },
+            data: { name },
+        });
+        res.json(updatedGenre);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error updating genre.' });
     }
 });
 
